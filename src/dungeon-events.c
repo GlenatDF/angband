@@ -1,21 +1,28 @@
 #include "dungeon-events.h"
-#include "game-world.h"
-#include "messages.h"
-#include "player.h"
+#include <stdlib.h>
+#include "message.h"
 
 #define EVENT_FREQUENCY 1000
-#define COOLDOWN_TURNS 500
+#define COOLDOWN_DURATION 50
 
-static int last_event_turn = 0;
+static int event_cooldown = 0;
+
+static const char *events[] = {
+    "You hear distant footsteps echoing in the halls.",
+    "A cold wind blows from deeper within the dungeon.",
+    "The air seems to shimmer momentarily.",
+    "You feel the floor tremble slightly beneath you."
+};
 
 void trigger_dungeon_event(void) {
-    if (!player_in_dungeon()) return;
-
-    int current_turn = get_current_turn();
-    if (current_turn - last_event_turn < COOLDOWN_TURNS) return;
+    if (event_cooldown > 0) {
+        event_cooldown--;
+        return;
+    }
 
     if (rand() % EVENT_FREQUENCY == 0) {
-        last_event_turn = current_turn;
-        msg("You hear distant echoes..."); // Example message
+        int event_index = rand() % (sizeof(events) / sizeof(events[0]));
+        msg_print(events[event_index]);
+        event_cooldown = COOLDOWN_DURATION;
     }
 }

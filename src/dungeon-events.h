@@ -3,4 +3,4 @@
 
 void trigger_dungeon_event(void);
 
-#endif // DUNGEON_EVENTS_H
+#endif /* DUNGEON_EVENTS_H */
