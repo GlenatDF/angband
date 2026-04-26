@@ -1,17 +1,14 @@
 #include "game-world.h"
-#include "player.h"
+#include "dungeon-events.h"
 
-static int current_turn = 0;
+void process_player_turn() {
+    // Existing player turn logic...
 
-int get_current_turn(void) {
-    return current_turn;
-}
+    int current_turn = get_current_turn();
+    int dungeon_depth = get_dungeon_depth();
 
-int player_in_dungeon(void) {
-    // Simplified example, real implementation might check actual level type
-    return 1; // Assume player is always in dungeon for this example
-}
+    // Attempt to trigger a dungeon event
+    try_trigger_dungeon_event(current_turn, dungeon_depth);
 
-void increment_turn(void) {
-    current_turn++;
+    // Continue with the rest of the turn processing...
 }
