@@ -1,44 +1,25 @@
 #include "dungeon-events.h"
-#include "game-world.h"  // Assuming this file contains necessary game state information
+#include "z-msg.h"
 
-// Event frequency and cooldown constants
-#define EVENT_TRIGGER_FREQUENCY 100  // Trigger an event on average every 100 turns
-#define EVENT_COOLDOWN_DURATION 50   // Minimum turns between events
-
-// Messages for atmospheric events
-static const char *atmospheric_messages[] = {
-    "You hear distant footsteps echoing through the halls.",
-    "A ghostly wail reverberates from somewhere deep within the dungeon.",
-    "A chill wind blows through the area, carrying whispers of the past.",
-    "The air grows still and eerily silent, as if the dungeon itself is holding its breath."
+static int last_event_turn = 0;
+static const int EVENT_FREQUENCY = 600;
+static const char *event_messages[] = {
+    "You hear distant echoes of battle.",
+    "A chill runs down your spine.",
+    "You sense something watching you in the darkness.",
+    "An eerie silence falls over the area."
 };
 
-// State variables
-static int last_event_turn = -EVENT_COOLDOWN_DURATION;  // Initialize to allow immediate first event
+void dungeon_event_director_on_turn(int current_turn, int player_depth) {
+    if (player_depth <= 0) return;  // No events in town or non-dungeon levels
 
-// Function to check and trigger an event
-void try_trigger_dungeon_event(int current_turn, int dungeon_depth) {
-    // Avoid triggering events on dungeon level 0 (town)
-    if (dungeon_depth <= 0) {
-        return;
-    }
+    if (current_turn - last_event_turn < EVENT_FREQUENCY) return;
 
-    // Calculate turns since the last event
-    int turns_since_last_event = current_turn - last_event_turn;
+    int chance = rand() % EVENT_FREQUENCY;
+    if (chance != 0) return;
 
-    // Check if we are ready to trigger another event
-    if (turns_since_last_event >= EVENT_COOLDOWN_DURATION) {
-        // Random chance to trigger an event
-        if (rand() % EVENT_TRIGGER_FREQUENCY == 0) {
-            // Choose a random event message
-            int message_index = rand() % (sizeof(atmospheric_messages) / sizeof(atmospheric_messages[0]));
-            const char *message = atmospheric_messages[message_index];
+    last_event_turn = current_turn;
 
-            // Use the game's messaging system to show the event message
-            msg_print(message);
-
-            // Update the turn when the last event was triggered
-            last_event_turn = current_turn;
-        }
-    }
+    const char *message = event_messages[rand() % (sizeof(event_messages) / sizeof(event_messages[0]))];
+    msg(message);
 }
